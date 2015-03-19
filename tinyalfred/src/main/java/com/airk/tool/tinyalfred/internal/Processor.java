@@ -1,7 +1,6 @@
 package com.airk.tool.tinyalfred.internal;
 
 import com.airk.tool.tinyalfred.TinyAlfred;
-import com.airk.tool.tinyalfred.annotation.FindView;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;

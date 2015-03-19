@@ -89,7 +89,7 @@ class FindViewHandler implements Handler {
     /**
      * Created by kevin on 15/3/17.
      */
-    public static class ViewBean {
+    static class ViewBean {
 
         private final int id;
         private final String name;

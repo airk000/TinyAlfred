@@ -58,7 +58,7 @@ public class OnClickHandler implements Handler {
         processor.addOnClick(bean);
     }
 
-    public class OnClickBean {
+    static class OnClickBean {
         private final int targetId;
         private final String methodName;
         private final boolean hasViewParam;
