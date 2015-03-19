@@ -4,26 +4,24 @@ import com.airk.tool.tinyalfred.annotation.FindView;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Created by kevin on 15/3/17.
  */
-public class TinyAlfredProcessor extends AbstractProcessor {
+public final class TinyAlfredProcessor extends AbstractProcessor {
 
     Elements elementUtil;
     Filer filer;
     static Messager messager;
+    Map<Class<? extends Annotation>, Handler> handlers = new LinkedHashMap<Class<? extends Annotation>, Handler>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -32,12 +30,20 @@ public class TinyAlfredProcessor extends AbstractProcessor {
         elementUtil = processingEnv.getElementUtils();
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
+
+        initAllHandlers();
+    }
+
+    private void initAllHandlers() {
+        handlers.put(FindView.class, new FindViewHandler());
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> set = new LinkedHashSet<String>();
-        set.add(FindView.class.getCanonicalName());
+        for (Map.Entry<Class<? extends Annotation>, Handler> entry : handlers.entrySet()) {
+            set.add(entry.getValue().canHandle().getCanonicalName());
+        }
         return set;
     }
 
@@ -48,39 +54,50 @@ public class TinyAlfredProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        Map<TypeElement, Handler> handlerMap = findTargets(env);
+        Map<TypeElement, Processor> processorMap = getAllProcessor(env);
 
-        for (Map.Entry<TypeElement, Handler> entry : handlerMap.entrySet()) {
+        for (Map.Entry<TypeElement, Processor> entry : processorMap.entrySet()) {
             TypeElement element = entry.getKey();
-            Handler handler = entry.getValue();
+            Processor processor = entry.getValue();
             try {
-                JavaFileObject fileObject = filer.createSourceFile(handler.getFileName(), element);
+                JavaFileObject fileObject = filer.createSourceFile(processor.getFileName(), element);
                 Writer writer = fileObject.openWriter();
-                writer.write(handler.getGenerateJavaCode());
+                writer.write(processor.getGenerateJavaCode());
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                errorLog("Can't write class " + handler.getFileName() + " REASON: " + e.getMessage());
+                errorLog("Can't write class " + processor.getFileName() + " REASON: " + e.getMessage());
             }
         }
         return true;
     }
 
-    private Map<TypeElement, Handler> findTargets(RoundEnvironment env) {
-        Map<TypeElement, Handler> map = new LinkedHashMap<TypeElement, Handler>();
+    private Map<TypeElement, Processor> getAllProcessor(RoundEnvironment env) {
+        Map<TypeElement, Processor> map = new LinkedHashMap<TypeElement, Processor>();
 
-        for (Element element : env.getElementsAnnotatedWith(FindView.class)) {
-            TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-            Handler handler = map.get(enclosingElement);
-            if (handler != null) {
-                handler.addView(element);
-            } else {
-                handler = Handler.getHandler(element, elementUtil);
-                map.put(enclosingElement, handler);
+        for (Map.Entry<Class<? extends Annotation>, Handler> entry : handlers.entrySet()) {
+            for (Element element : env.getElementsAnnotatedWith(entry.getKey())) {
+                if (!modifierCheck(element, entry.getKey())) {
+                    continue;
+                }
+                TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+                Processor processor = map.get(enclosingElement);
+                if (processor == null) {
+                    processor = Processor.getProcessor(element, elementUtil);
+                }
+                entry.getValue().handle(processor, element);
+                map.put(enclosingElement, processor);
             }
-            handler.addView(element);
         }
         return map;
+    }
+
+    boolean modifierCheck(Element e, Class<? extends Annotation> clazz) {
+        if (e.getModifiers().contains(Modifier.PRIVATE)) {
+            errorLog("@" + clazz.getSimpleName() + " can\'t be used for private " + e.asType() + " " + e.getSimpleName());
+            return false;
+        }
+        return true;
     }
 
     static void debugLog(Object o) {
@@ -93,5 +110,27 @@ public class TinyAlfredProcessor extends AbstractProcessor {
 
     static void errorLog(CharSequence cs) {
         messager.printMessage(Diagnostic.Kind.ERROR, cs);
+    }
+
+    static String printElement(Element e) {
+        if (e.getKind() == ElementKind.FIELD) {
+            return "(" + e.asType() + ") " + e.getSimpleName();
+        } else if (e.getKind() == ElementKind.METHOD) {
+            StringBuilder sb = new StringBuilder();
+            for (Modifier m : e.getModifiers()) {
+                sb.append(m.toString()).append(" ");
+            }
+            sb.append(e.getSimpleName());
+            ExecutableElement executableElement = (ExecutableElement) e;
+            sb.append("(");
+            for (VariableElement var : executableElement.getParameters()) {
+                sb.append(var.asType()).append(" ").append(var.getSimpleName()).append(",");
+            }
+            sb.deleteCharAt(sb.length());
+            sb.append(")");
+            return sb.toString();
+        } else {
+            return "";
+        }
     }
 }

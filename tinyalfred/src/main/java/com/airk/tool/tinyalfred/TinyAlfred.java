@@ -1,6 +1,7 @@
 package com.airk.tool.tinyalfred;
 
 import android.app.Activity;
+import android.view.View;
 import android.util.Log;
 
 /**
@@ -12,13 +13,16 @@ public class TinyAlfred {
     public static final String SUFFIX = "$$Alfred";
 
     public static void process(Activity activity) {
-        process(activity, activity);
+        processInternal(activity, activity);
     }
 
-    public static void process(Object belong, Object root) {
+    public static void process(Object belong, View view) {
+        processInternal(belong, view);
+    }
+
+    private static void processInternal(Object belong, Object root) {
         try {
             Class<?> clazz = Class.forName(belong.getClass().getName() + SUFFIX);
-            Log.d(TAG, belong.getClass().getName());
             Alfred alfred = (Alfred) clazz.newInstance();
             alfred.handleViews(belong, root);
         } catch (ClassNotFoundException e) {
@@ -29,4 +33,5 @@ public class TinyAlfred {
             e.printStackTrace();
         }
     }
+
 }
