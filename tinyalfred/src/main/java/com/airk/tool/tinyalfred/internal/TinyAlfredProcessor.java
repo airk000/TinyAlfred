@@ -60,7 +60,7 @@ public class TinyAlfredProcessor extends AbstractProcessor {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                errorLog("Can't write new class " + handler.getFileName() + "  " + e.getMessage());
+                errorLog("Can't write class " + handler.getFileName() + " REASON: " + e.getMessage());
             }
         }
         return true;
