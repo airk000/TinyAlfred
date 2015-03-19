@@ -30,7 +30,7 @@ class FindViewHandler implements Handler {
             return;
         }
         FindViewHandler.ViewBean bean = new FindViewHandler.ViewBean(id, e.getSimpleName().toString(), e.asType().toString());
-        processor.addView(bean);
+        processor.addFindView(bean);
     }
 
     private boolean check(Element e) {

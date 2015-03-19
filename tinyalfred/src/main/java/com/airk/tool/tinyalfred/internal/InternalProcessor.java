@@ -1,6 +1,7 @@
 package com.airk.tool.tinyalfred.internal;
 
 import com.airk.tool.tinyalfred.annotation.FindView;
+import com.airk.tool.tinyalfred.annotation.OnClick;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -36,6 +37,7 @@ public final class InternalProcessor extends AbstractProcessor {
 
     private void initAllHandlers() {
         handlers.put(FindView.class, new FindViewHandler());
+        handlers.put(OnClick.class, new OnClickHandler());
     }
 
     @Override
@@ -94,7 +96,8 @@ public final class InternalProcessor extends AbstractProcessor {
 
     boolean modifierCheck(Element e, Class<? extends Annotation> clazz) {
         if (e.getModifiers().contains(Modifier.PRIVATE)) {
-            errorLog("@" + clazz.getSimpleName() + " can\'t be used for private " + e.asType() + " " + e.getSimpleName());
+            errorLog("@" + clazz.getSimpleName() + " can\'t be used for private " + dumpElement(e)
+                    + ", please keep it public or default.");
             return false;
         }
         return true;
@@ -124,9 +127,11 @@ public final class InternalProcessor extends AbstractProcessor {
             ExecutableElement executableElement = (ExecutableElement) e;
             sb.append("(");
             for (VariableElement var : executableElement.getParameters()) {
-                sb.append(var.asType()).append(" ").append(var.getSimpleName()).append(",");
+                sb.append(" ").append(var.asType()).append(" ").append(var.getSimpleName()).append(",");
             }
-            sb.deleteCharAt(sb.length());
+            if (executableElement.getParameters() != null && executableElement.getParameters().size() > 0) {
+                sb.deleteCharAt(sb.length() - 1);
+            }
             sb.append(")");
             return sb.toString();
         } else {
