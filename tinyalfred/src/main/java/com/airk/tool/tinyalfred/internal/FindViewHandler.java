@@ -8,6 +8,8 @@ import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import android.view.View;
+
 /**
  * Created by kevin on 15/3/19.
  */
@@ -22,16 +24,22 @@ class FindViewHandler implements Handler {
         if (!check(e)) {
             return;
         }
-        processor.addView(e);
+        int id = e.getAnnotation(FindView.class).value();
+        if (id == View.NO_ID) {
+            InternalProcessor.errorLog("@FindView must have a valid id like R.id.text1 (" + InternalProcessor.dumpElement(e) + ")");
+            return;
+        }
+        FindViewHandler.ViewBean bean = new FindViewHandler.ViewBean(id, e.getSimpleName().toString(), e.asType().toString());
+        processor.addView(bean);
     }
 
     private boolean check(Element e) {
         if (e.getKind() != ElementKind.FIELD) {
-            TinyAlfredProcessor.errorLog("@FindView can only be used for field, now is " + TinyAlfredProcessor.printElement(e));
+            InternalProcessor.errorLog("@FindView can only be used for field, now is " + InternalProcessor.dumpElement(e));
             return false;
         }
         if (!isSubtypeOfType(e.asType(), "android.view.View")) {
-            TinyAlfredProcessor.errorLog("@FindView can only be used for View object, now is " + TinyAlfredProcessor.printElement(e));
+            InternalProcessor.errorLog("@FindView can only be used for View object, now is " + InternalProcessor.dumpElement(e));
             return false;
         }
         return true;

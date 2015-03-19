@@ -27,18 +27,16 @@ final class Processor {
         String packageName = util.getPackageOf(enclosingElement).getQualifiedName().toString();
         //MyActivity$Holder
         String className = getClassName(enclosingElement, packageName) + TinyAlfred.SUFFIX;
-        return new Processor(enclosingElement, fullName, packageName, className);
+        return new Processor(fullName, packageName, className);
     }
 
-    private Processor(Element enclosingElement, String fullName, String packageName, String className) {
+    private Processor(String fullName, String packageName, String className) {
         this.fullName = fullName;
         this.packageName = packageName;
         this.className = className;
     }
 
-    void addView(Element e) {
-        int id = e.getAnnotation(FindView.class).value();
-        FindViewHandler.ViewBean bean = new FindViewHandler.ViewBean(id, e.getSimpleName().toString(), e.asType().toString());
+    void addView(FindViewHandler.ViewBean bean) {
         if (!viewSet.contains(bean)) {
             viewSet.add(bean);
         }
@@ -49,24 +47,18 @@ final class Processor {
         builder.append("\npackage ").append(packageName).append(";\n\n");
         builder.append("import android.view.View;\n");
         builder.append("import android.app.Activity;\n");
+        builder.append("import com.airk.tool.tinyalfred.TinyAlfred;\n");
         builder.append("import com.airk.tool.tinyalfred.Alfred;\n\n");
 
         builder.append("public class ").append(className)
-                .append(" implements Alfred").append(" {\n");
+                .append(" implements Alfred<").append(fullName).append(">").append(" {\n");
         builder.append("    @Override\n")
-                .append("    public void handleViews(Object belong, Object root) {\n");
+                .append("    public void handleViews(").append(fullName).append(" belong, Object root) {\n");
 
-        builder.append("        if (root instanceof Activity) {\n");
         for (FindViewHandler.ViewBean bean : viewSet) {
-            builder.append("            ((").append(fullName).append(") belong).").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
-                    .append("((Activity) root).findViewById(").append(bean.getId()).append(");\n");
+            builder.append("        belong.").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
+                    .append(TinyAlfred.class.getSimpleName()).append(".findView(root, ").append(bean.getId()).append(", \"").append(bean.getName()).append("\");\n");
         }
-        builder.append("        } else if (root instanceof View) {\n");
-        for (FindViewHandler.ViewBean bean : viewSet) {
-            builder.append("            ((").append(fullName).append(") belong).").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
-                    .append("((View) root).findViewById(").append(bean.getId()).append(");\n");
-        }
-        builder.append("        }\n");
         builder.append("    }\n\n");
         builder.append("}\n");
         return builder.toString();

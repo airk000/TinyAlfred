@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by kevin on 15/3/17.
  */
-public final class TinyAlfredProcessor extends AbstractProcessor {
+public final class InternalProcessor extends AbstractProcessor {
 
     Elements elementUtil;
     Filer filer;
@@ -112,9 +112,9 @@ public final class TinyAlfredProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.ERROR, cs);
     }
 
-    static String printElement(Element e) {
+    static String dumpElement(Element e) {
         if (e.getKind() == ElementKind.FIELD) {
-            return "(" + e.asType() + ") " + e.getSimpleName();
+            return "(" + e.asType() + ") " + e.getSimpleName() + " (" + e.getEnclosingElement() + ")";
         } else if (e.getKind() == ElementKind.METHOD) {
             StringBuilder sb = new StringBuilder();
             for (Modifier m : e.getModifiers()) {
