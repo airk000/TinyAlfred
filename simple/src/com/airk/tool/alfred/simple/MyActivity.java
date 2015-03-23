@@ -29,16 +29,12 @@ public class MyActivity extends Activity {
         textView.setText("123");
     }
 
-    @OnClick(R.id.text)
+    @OnClick({R.id.text, R.id.image})
     void doClick(View view) {
-
-        TextView tv = (TextView) view;
-        Toast.makeText(this, tv.getText().toString(), Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.image)
-    void doImageClick(View v) {
-        Toast.makeText(this, "ImageClick", Toast.LENGTH_SHORT).show();
+        if (view instanceof TextView) {
+            TextView tv = (TextView) view;
+            Toast.makeText(this, tv.getText().toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public class Holder {

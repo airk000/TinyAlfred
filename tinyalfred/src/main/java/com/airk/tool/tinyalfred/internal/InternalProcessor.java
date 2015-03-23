@@ -1,6 +1,7 @@
 package com.airk.tool.tinyalfred.internal;
 
 import com.airk.tool.tinyalfred.annotation.FindView;
+import com.airk.tool.tinyalfred.annotation.ListenerDeclare;
 import com.airk.tool.tinyalfred.annotation.OnClick;
 
 import javax.annotation.processing.*;

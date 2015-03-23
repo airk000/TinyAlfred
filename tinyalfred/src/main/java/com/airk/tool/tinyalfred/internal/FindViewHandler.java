@@ -1,14 +1,17 @@
 package com.airk.tool.tinyalfred.internal;
 
+import android.view.View;
+import com.airk.tool.tinyalfred.TinyAlfred;
 import com.airk.tool.tinyalfred.annotation.FindView;
 
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.List;
-
-import android.view.View;
+import java.util.Set;
 
 /**
  * Created by kevin on 15/3/19.
@@ -86,9 +89,18 @@ class FindViewHandler implements Handler {
         return false;
     }
 
-    /**
-     * Created by kevin on 15/3/17.
-     */
+    public static String generateCode(Set<ViewBean> set, String fullName) {
+        StringBuilder builder = new StringBuilder("    @Override\n");
+        builder.append("    public void findViews(final ").append(fullName).append(" belong, Object root) {\n");
+        for (FindViewHandler.ViewBean bean : set) {
+            builder.append("        belong.").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
+                    .append(TinyAlfred.class.getSimpleName()).append(".findView(root, ").append(bean.getId())
+                    .append(", \"").append(bean.getName()).append("\");\n");
+        }
+        builder.append("    }\n\n");
+        return builder.toString();
+    }
+
     static class ViewBean {
 
         private final int id;

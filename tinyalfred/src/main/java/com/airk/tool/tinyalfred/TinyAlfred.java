@@ -46,9 +46,11 @@ public class TinyAlfred {
         try {
             Class<?> clazz = Class.forName(belong.getClass().getName() + SUFFIX);
             Alfred alfred = (Alfred) clazz.newInstance();
-            alfred.handleViews(belong, root);
+            alfred.findViews(belong, root);
+            alfred.handlePreDraw(belong, root);
+            alfred.handleListeners(belong, root);
             if (debug) {
-                Log.d(TAG, clazz.getName() + ".handleViews(...) has been invoked.");
+                Log.d(TAG, clazz.getName() + ".findViews(...) has been invoked.");
             }
         } catch (ClassNotFoundException ignore) {
             if (debug) {

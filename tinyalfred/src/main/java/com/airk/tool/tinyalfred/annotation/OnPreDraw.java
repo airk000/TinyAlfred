@@ -8,13 +8,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by kevin on 15/3/19.
+ * Created by kevin on 15/3/23.
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
-@ListenerDeclare(setterName = "setOnClickListener",
-        setterParam = "View.OnClickListener()",
-        listenerName = "onClick")
-public @interface OnClick {
-    int[] value() default {View.NO_ID};
+@ListenerDeclare(setterName = "getViewTreeObserver().addOnPreDrawListener",
+        setterParam = "android.view.ViewTreeObserver.OnPreDrawListener()",
+        listenerName = "onPreDraw")
+public @interface OnPreDraw {
+    int value() default View.NO_ID;
 }

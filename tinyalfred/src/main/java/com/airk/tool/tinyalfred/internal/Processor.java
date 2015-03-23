@@ -5,7 +5,9 @@ import com.airk.tool.tinyalfred.TinyAlfred;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by kevin on 15/3/17.
@@ -58,43 +60,18 @@ final class Processor {
 
         builder.append("public class ").append(className)
                 .append(" implements Alfred<").append(fullName).append(">").append(" {\n");
+
+        builder.append(FindViewHandler.generateCode(viewSet, fullName));
+        builder.append(OnClickHandler.generateCode(clickSet, viewSet, fullName));
         builder.append("    @Override\n")
-                .append("    public void handleViews(final ").append(fullName).append(" belong, Object root) {\n");
+                .append("    public void handlePreDraw(final ").append(fullName).append(" belong, Object root) {\n")
+                .append("    }\n\n");
 
-        for (FindViewHandler.ViewBean bean : viewSet) {
-            builder.append("        belong.").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
-                    .append(TinyAlfred.class.getSimpleName()).append(".findView(root, ").append(bean.getId())
-                    .append(", \"").append(bean.getName()).append("\");\n");
-        }
-
-        builder.append("\n");
-        for (OnClickHandler.OnClickBean bean : clickSet) {
-            FindViewHandler.ViewBean viewBean = findViewInSet(bean.getTargetId());
-            if (viewBean != null) { // this view has been founded
-                builder.append("        belong.").append(viewBean.getName());
-            } else {
-                builder.append("        ").append(TinyAlfred.class.getSimpleName()).append(".findView(root, ")
-                        .append(bean.getTargetId()).append(", \"").append(bean.getMethodName()).append("\")");
-            }
-            builder.append(".setOnClickListener(new View.OnClickListener() {\n")
-                    .append("            @Override\n")
-                    .append("            public void onClick(View view) {\n")
-                    .append("                belong.").append(bean.getMethodName());
-            if (bean.hasViewParam()) {
-                builder.append("(view);\n");
-            } else {
-                builder.append("();\n");
-            }
-            builder.append("            }\n")
-                    .append("        });\n");
-        }
-
-        builder.append("    }\n\n"); // method handleViews endpoint
         builder.append("}\n"); // class endpoint
         return builder.toString();
     }
 
-    private FindViewHandler.ViewBean findViewInSet(int targetId) {
+    static FindViewHandler.ViewBean findViewInSet(int targetId, Set<FindViewHandler.ViewBean> viewSet) {
         for (FindViewHandler.ViewBean viewBean : viewSet) {
             if (viewBean.getId() == targetId) {
                 return viewBean;
