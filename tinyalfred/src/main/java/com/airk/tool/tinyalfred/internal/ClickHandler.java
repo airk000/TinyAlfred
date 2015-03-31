@@ -94,7 +94,6 @@ class ClickHandler implements Handler {
                             .append("        }\n");
                 }
                 ListenerDeclare declare = OnClick.class.getAnnotation(ListenerDeclare.class);
-                InternalProcessor.debugLog(declare);
                 builder.append("        tmp.").append(declare.setterName()).append("(new ").append(declare.setterParam()).append(" {\n")
                         .append("            @Override\n")
                         .append("            public void ").append(declare.listenerName())
