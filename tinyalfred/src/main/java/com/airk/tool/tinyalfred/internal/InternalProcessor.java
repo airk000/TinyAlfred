@@ -1,8 +1,9 @@
 package com.airk.tool.tinyalfred.internal;
 
 import com.airk.tool.tinyalfred.annotation.FindView;
-import com.airk.tool.tinyalfred.annotation.ListenerDeclare;
 import com.airk.tool.tinyalfred.annotation.OnClick;
+import com.airk.tool.tinyalfred.annotation.OnLongClick;
+import com.airk.tool.tinyalfred.annotation.OnPreDraw;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -38,7 +39,9 @@ public final class InternalProcessor extends AbstractProcessor {
 
     private void initAllHandlers() {
         handlers.put(FindView.class, new FindViewHandler());
-        handlers.put(OnClick.class, new OnClickHandler());
+        handlers.put(OnClick.class, new ClickHandler());
+        handlers.put(OnLongClick.class, new LongClickHandler());
+        handlers.put(OnPreDraw.class, new PreDrawHandler());
     }
 
     @Override
@@ -86,7 +89,7 @@ public final class InternalProcessor extends AbstractProcessor {
                 TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
                 Processor processor = map.get(enclosingElement);
                 if (processor == null) {
-                    processor = Processor.getProcessor(element, elementUtil);
+                    processor = Processor.getProcessor(element, elementUtil, handlers);
                 }
                 entry.getValue().handle(processor, element);
                 map.put(enclosingElement, processor);

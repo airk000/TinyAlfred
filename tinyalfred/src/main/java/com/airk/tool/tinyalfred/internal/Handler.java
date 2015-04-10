@@ -11,4 +11,6 @@ interface Handler {
     Class<? extends Annotation> canHandle();
 
     void handle(Processor processor, Element e);
+
+    String generateCode(Processor processor, String fullName);
 }

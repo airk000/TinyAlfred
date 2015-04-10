@@ -27,6 +27,12 @@ public class MyActivity extends Activity {
         TinyAlfred.process(this);
 
         textView.setText("123");
+        textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
     }
 
     @OnClick({R.id.text, R.id.image})

@@ -5,8 +5,10 @@ import com.airk.tool.tinyalfred.TinyAlfred;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.lang.annotation.Annotation;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,11 +19,12 @@ final class Processor {
     private final String fullName;
     private final String packageName;
     private final String className;
+    private final Map<Class<? extends Annotation>, Handler> handlers;
 
-    private Set<FindViewHandler.ViewBean> viewSet = new LinkedHashSet<FindViewHandler.ViewBean>();
-    private Set<OnClickHandler.OnClickBean> clickSet = new LinkedHashSet<OnClickHandler.OnClickBean>();
+    Set<ViewModel> viewSet = new LinkedHashSet<ViewModel>();
+    Set<OnClickModel> clickSet = new LinkedHashSet<OnClickModel>();
 
-    static Processor getProcessor(Element e, Elements util) {
+    static Processor getProcessor(Element e, Elements util, Map<Class<? extends Annotation>, Handler> handlers) {
         TypeElement enclosingElement = (TypeElement) e.getEnclosingElement();
         //com.airk.tool.alfred.simple.MyActivity.Holder
         String fullName = enclosingElement.getQualifiedName().toString();
@@ -29,24 +32,25 @@ final class Processor {
         String packageName = util.getPackageOf(enclosingElement).getQualifiedName().toString();
         //MyActivity$Holder
         String className = getClassName(enclosingElement, packageName) + TinyAlfred.SUFFIX;
-        return new Processor(fullName, packageName, className);
+        return new Processor(fullName, packageName, className, handlers);
     }
 
-    private Processor(String fullName, String packageName, String className) {
+    private Processor(String fullName, String packageName, String className, Map<Class<? extends Annotation>, Handler> handlers) {
         this.fullName = fullName;
         this.packageName = packageName;
         this.className = className;
+        this.handlers = handlers;
     }
 
-    void addFindView(FindViewHandler.ViewBean bean) {
+    void addFindView(ViewModel bean) {
         if (!viewSet.contains(bean)) {
             viewSet.add(bean);
         }
     }
 
-    void addOnClick(OnClickHandler.OnClickBean bean) {
-        if (!clickSet.contains(bean)) {
-            clickSet.add(bean);
+    void addOnClick(OnClickModel m) {
+        if (!clickSet.contains(m)) {
+            clickSet.add(m);
         }
     }
 
@@ -60,21 +64,18 @@ final class Processor {
 
         builder.append("public class ").append(className)
                 .append(" implements Alfred<").append(fullName).append(">").append(" {\n");
-
-        builder.append(FindViewHandler.generateCode(viewSet, fullName));
-        builder.append(OnClickHandler.generateCode(clickSet, viewSet, fullName));
-        builder.append("    @Override\n")
-                .append("    public void handlePreDraw(final ").append(fullName).append(" belong, Object root) {\n")
-                .append("    }\n\n");
-
+        for (Map.Entry<Class<? extends Annotation>, Handler> e : handlers.entrySet()) {
+            Handler h = e.getValue();
+            builder.append(h.generateCode(this, fullName));
+        }
         builder.append("}\n"); // class endpoint
         return builder.toString();
     }
 
-    static FindViewHandler.ViewBean findViewInSet(int targetId, Set<FindViewHandler.ViewBean> viewSet) {
-        for (FindViewHandler.ViewBean viewBean : viewSet) {
-            if (viewBean.getId() == targetId) {
-                return viewBean;
+    static ViewModel findViewInSet(int targetId, Set<ViewModel> viewSet) {
+        for (ViewModel m : viewSet) {
+            if (m.getId() == targetId) {
+                return m;
             }
         }
         return null;

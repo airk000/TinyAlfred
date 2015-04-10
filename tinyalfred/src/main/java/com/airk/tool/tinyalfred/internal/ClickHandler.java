@@ -3,6 +3,7 @@ package com.airk.tool.tinyalfred.internal;
 import android.view.View;
 import com.airk.tool.tinyalfred.TinyAlfred;
 import com.airk.tool.tinyalfred.annotation.ListenerDeclare;
+import com.airk.tool.tinyalfred.annotation.NullableView;
 import com.airk.tool.tinyalfred.annotation.OnClick;
 
 import javax.lang.model.element.Element;
@@ -10,12 +11,11 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by kevin on 15/3/19.
  */
-public class OnClickHandler implements Handler {
+class ClickHandler implements Handler {
     @Override
     public Class<? extends Annotation> canHandle() {
         return OnClick.class;
@@ -41,7 +41,7 @@ public class OnClickHandler implements Handler {
         ExecutableElement executableElement = (ExecutableElement) e;
         if (!executableElement.getReturnType().toString().equals("void")) {
             InternalProcessor.errorLog("Method " + InternalProcessor.dumpElement(e) + " return " + executableElement.getReturnType() + ","
-                    + " it's no mean, please change it to 'void'.");
+                    + " it doesn't make sense, please change it to 'void'.");
             return;
         }
         List<? extends VariableElement> params = executableElement.getParameters();
@@ -62,30 +62,46 @@ public class OnClickHandler implements Handler {
                 hasOneViewParameter = true;
             }
         }
-        OnClickBean bean = new OnClickBean(ids, e.getSimpleName().toString(), hasOneViewParameter);
-        processor.addOnClick(bean);
+        boolean nullCheck = e.getAnnotation(NullableView.class) != null;
+        OnClickModel model = new OnClickModel(ids, e.getSimpleName().toString(), hasOneViewParameter, nullCheck);
+        processor.addOnClick(model);
     }
 
-    static String generateCode(Set<OnClickBean> set, Set<FindViewHandler.ViewBean> viewSet, String fullName) {
+    @Override
+    public String generateCode(Processor processor, String fullName) {
         StringBuilder builder = new StringBuilder("    @Override\n");
         builder.append("    public void handleListeners(final ").append(fullName).append(" belong, Object root) {\n");
-        for (OnClickHandler.OnClickBean bean : set) {
-            for (int id : bean.getTargetId()) {
-                FindViewHandler.ViewBean viewBean = Processor.findViewInSet(id, viewSet);
-                if (viewBean != null) { // this view has been founded
-                    builder.append("        belong.").append(viewBean.getName());
+        builder.append("        View tmp;\n");
+        for (OnClickModel model : processor.clickSet) {
+            for (int id : model.getTargetId()) {
+                boolean nullCheck;
+                String hintName;
+                ViewModel viewModel = Processor.findViewInSet(id, processor.viewSet);
+                if (viewModel != null) { // this view has been founded
+                    nullCheck = viewModel.isNullable();
+                    hintName = viewModel.getName();
+                    builder.append("        tmp = belong.").append(viewModel.getName()).append(";\n");
                 } else {
-                    builder.append("        ").append(TinyAlfred.class.getSimpleName()).append(".findView(root, ")
-                            .append(id).append(", \"").append(bean.getMethodName()).append("\")");
+                    nullCheck = model.isNullCheck();
+                    hintName = String.valueOf(id);
+                    builder.append("        tmp = ").append(TinyAlfred.class.getSimpleName()).append(".findView(root, ")
+                            .append(id).append(", \"").append(model.getMethodName()).append("\");\n");
+                }
+                if (nullCheck) {
+                    builder.append("        if (tmp == null) {\n")
+                            .append("            throw new NullPointerException(\"View ").append(hintName)
+                            .append(" can not be found, try @NullableView before if it is possible null, otherwise you have to find out why.\");\n")
+                            .append("        }\n");
                 }
                 ListenerDeclare declare = OnClick.class.getAnnotation(ListenerDeclare.class);
                 InternalProcessor.debugLog(declare);
-                builder.append(".").append(declare.setterName()).append("(new ").append(declare.setterParam()).append(" {\n")
+                builder.append("        tmp.").append(declare.setterName()).append("(new ").append(declare.setterParam()).append(" {\n")
                         .append("            @Override\n")
                         .append("            public void ").append(declare.listenerName())
                         .append("(View view) {\n");
-                builder.append("                belong.").append(bean.getMethodName());
-                if (bean.hasViewParam()) {
+                builder.append("                belong.").append(model.getMethodName());
+
+                if (model.hasViewParam()) {
                     builder.append("(view);\n");
                 } else {
                     builder.append("();\n");
@@ -98,27 +114,4 @@ public class OnClickHandler implements Handler {
         return builder.toString();
     }
 
-    static class OnClickBean {
-        private final int[] targetId;
-        private final String methodName;
-        private final boolean hasViewParam;
-
-        public OnClickBean(int[] targetId, String methodName, boolean hasViewParam) {
-            this.targetId = targetId;
-            this.methodName = methodName;
-            this.hasViewParam = hasViewParam;
-        }
-
-        public int[] getTargetId() {
-            return targetId;
-        }
-
-        public String getMethodName() {
-            return methodName;
-        }
-
-        public boolean hasViewParam() {
-            return hasViewParam;
-        }
-    }
 }

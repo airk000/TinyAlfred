@@ -3,6 +3,7 @@ package com.airk.tool.tinyalfred.internal;
 import android.view.View;
 import com.airk.tool.tinyalfred.TinyAlfred;
 import com.airk.tool.tinyalfred.annotation.FindView;
+import com.airk.tool.tinyalfred.annotation.NullableView;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -11,7 +12,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by kevin on 15/3/19.
@@ -32,8 +32,29 @@ class FindViewHandler implements Handler {
             InternalProcessor.errorLog("@FindView must have a valid id like R.id.text1 (" + InternalProcessor.dumpElement(e) + ")");
             return;
         }
-        FindViewHandler.ViewBean bean = new FindViewHandler.ViewBean(id, e.getSimpleName().toString(), e.asType().toString());
-        processor.addFindView(bean);
+        boolean nullable = e.getAnnotation(NullableView.class) != null;
+        ViewModel model = new ViewModel(id, e.getSimpleName().toString(), e.asType().toString(), nullable);
+        processor.addFindView(model);
+    }
+
+    @Override
+    public String generateCode(Processor processor, String fullName) {
+        StringBuilder builder = new StringBuilder("    @Override\n");
+        builder.append("    public void findViews(final ").append(fullName).append(" belong, Object root) {\n");
+        for (ViewModel model : processor.viewSet) {
+            builder.append("        belong.").append(model.getName()).append(" = ").append("(").append(model.getType()).append(") ")
+                    .append(TinyAlfred.class.getSimpleName()).append(".findView(root, ").append(model.getId())
+                    .append(", \"").append(model.getName()).append("\");\n");
+            //do a null point check, if there is a null point bug, let user attention it here but not later.
+            if (model.isNullable()) {
+                builder.append("        if (belong.").append(model.getName()).append(" == null) {\n")
+                        .append("            throw new NullPointerException(\"View ").append(model.getName())
+                        .append(" can not be found, try @NullableView before if it is possible null, otherwise you have to find out why.\");\n")
+                        .append("        }\n");
+            }
+        }
+        builder.append("    }\n\n");
+        return builder.toString();
     }
 
     private boolean check(Element e) {
@@ -89,40 +110,4 @@ class FindViewHandler implements Handler {
         return false;
     }
 
-    public static String generateCode(Set<ViewBean> set, String fullName) {
-        StringBuilder builder = new StringBuilder("    @Override\n");
-        builder.append("    public void findViews(final ").append(fullName).append(" belong, Object root) {\n");
-        for (FindViewHandler.ViewBean bean : set) {
-            builder.append("        belong.").append(bean.getName()).append(" = ").append("(").append(bean.getType()).append(") ")
-                    .append(TinyAlfred.class.getSimpleName()).append(".findView(root, ").append(bean.getId())
-                    .append(", \"").append(bean.getName()).append("\");\n");
-        }
-        builder.append("    }\n\n");
-        return builder.toString();
-    }
-
-    static class ViewBean {
-
-        private final int id;
-        private final String name;
-        private final String type;
-
-        public ViewBean(int id, String name, String type) {
-            this.id = id;
-            this.name = name;
-            this.type = type;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-    }
 }
