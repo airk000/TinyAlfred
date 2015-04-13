@@ -1,4 +1,4 @@
-package com.airk.tool.alfred.simple;
+package com.airk.tool.alfred.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.airk.tool.tinyalfred.TinyAlfred;
 import com.airk.tool.tinyalfred.annotation.FindView;
+import com.airk.tool.tinyalfred.annotation.NullableView;
 import com.airk.tool.tinyalfred.annotation.OnClick;
 
 public class MyActivity extends Activity {
@@ -16,7 +17,7 @@ public class MyActivity extends Activity {
      */
 
 
-    @FindView(R.id.text)
+    @NullableView @FindView(R.id.text)
     TextView textView;
 
     @Override

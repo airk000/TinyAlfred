@@ -33,6 +33,7 @@ class FindViewHandler implements Handler {
             return;
         }
         boolean nullable = e.getAnnotation(NullableView.class) != null;
+        InternalProcessor.debugLog(nullable + "@" + InternalProcessor.dumpElement(e));
         ViewModel model = new ViewModel(id, e.getSimpleName().toString(), e.asType().toString(), nullable);
         processor.addFindView(model);
     }
