@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.annotation;
+package com.github.airk.tinyalfred.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,4 +14,5 @@ import android.view.View;
 @Target(ElementType.FIELD)
 public @interface FindView {
     int value() default View.NO_ID;
+    //TODO multi-view version annotation
 }

@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred;
+package com.github.airk.tinyalfred;
 
 import android.app.Activity;
 import android.view.View;
@@ -11,6 +11,7 @@ public class TinyAlfred {
     private static final String TAG = TinyAlfred.class.getSimpleName();
 
     public static final String SUFFIX = "$$Alfred";
+    public static final String INNER = "$Alfred";
     private static boolean debug = false;
 
     /**
@@ -47,8 +48,9 @@ public class TinyAlfred {
             Class<?> clazz = Class.forName(belong.getClass().getName() + SUFFIX);
             Alfred alfred = (Alfred) clazz.newInstance();
             alfred.findViews(belong, root);
+            alfred.handleClick(belong, root);
+            alfred.handleLongClick(belong, root);
             alfred.handlePreDraw(belong, root);
-            alfred.handleListeners(belong, root);
             if (debug) {
                 Log.d(TAG, clazz.getName() + ".findViews(...) has been invoked.");
             }

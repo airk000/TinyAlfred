@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.internal;
+package com.github.airk.tinyalfred.internal;
 
 import javax.lang.model.element.Element;
 

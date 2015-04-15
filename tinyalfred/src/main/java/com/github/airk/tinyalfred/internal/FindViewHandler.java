@@ -1,9 +1,9 @@
-package com.airk.tool.tinyalfred.internal;
+package com.github.airk.tinyalfred.internal;
 
 import android.view.View;
-import com.airk.tool.tinyalfred.TinyAlfred;
-import com.airk.tool.tinyalfred.annotation.FindView;
-import com.airk.tool.tinyalfred.annotation.NullableView;
+import com.github.airk.tinyalfred.TinyAlfred;
+import com.github.airk.tinyalfred.annotation.FindView;
+import com.github.airk.tinyalfred.annotation.NullableView;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;

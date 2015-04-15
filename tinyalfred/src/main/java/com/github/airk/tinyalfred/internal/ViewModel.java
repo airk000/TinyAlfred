@@ -1,9 +1,9 @@
-package com.airk.tool.tinyalfred.internal;
+package com.github.airk.tinyalfred.internal;
 
 /**
  * Created by kevin on 15/4/10.
  */
-public class ViewModel {
+final class ViewModel {
     private final int id;
     private final String name;
     private final String type;

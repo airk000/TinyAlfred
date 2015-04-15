@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.annotation;
+package com.github.airk.tinyalfred.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.FIELD, ElementType.METHOD})
 /**
- * Note with FindView\OnClick or OnLayouted, means this view may be nullable.
+ * Note with other annotation, means this view may be nullable.
  */
 public @interface NullableView {
 }

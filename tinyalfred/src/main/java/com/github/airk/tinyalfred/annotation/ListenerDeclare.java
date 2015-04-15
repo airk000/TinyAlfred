@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.annotation;
+package com.github.airk.tinyalfred.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,4 +14,7 @@ public @interface ListenerDeclare {
     String setterName();
     String setterParam();
     String listenerName();
+    boolean hasViewParam() default true;
+    String listenerReturnType() default "void";
+    String userReturnType() default "void";
 }

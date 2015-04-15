@@ -9,9 +9,9 @@
     <version>7</version>
   </parent>-->
 
-  <groupId>com.airk.tool</groupId>
+  <groupId>com.github.airk000</groupId>
   <artifactId>tinyalfred-parent</artifactId>
-  <version>0.1.4-SNAPSHOT</version>
+  <version>0.1.7-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Tiny Alfred (Parent)</name>

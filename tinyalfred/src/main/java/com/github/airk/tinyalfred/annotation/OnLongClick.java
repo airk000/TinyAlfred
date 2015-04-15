@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.annotation;
+package com.github.airk.tinyalfred.annotation;
 
 import android.view.View;
 
@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @ListenerDeclare(setterName = "setOnLongClickListener",
         setterParam = "View.OnLongClickListener()",
-        listenerName = "onLongClick")
+        listenerName = "onLongClick",
+        listenerReturnType = "boolean",
+        userReturnType = "boolean")
 public @interface OnLongClick {
     int[] value() default {View.NO_ID};
 }

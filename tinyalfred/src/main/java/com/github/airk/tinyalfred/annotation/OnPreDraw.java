@@ -1,4 +1,4 @@
-package com.airk.tool.tinyalfred.annotation;
+package com.github.airk.tinyalfred.annotation;
 
 import android.view.View;
 
@@ -14,7 +14,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @ListenerDeclare(setterName = "getViewTreeObserver().addOnPreDrawListener",
         setterParam = "android.view.ViewTreeObserver.OnPreDrawListener()",
-        listenerName = "onPreDraw")
+        listenerName = "onPreDraw",
+        hasViewParam = false,
+        listenerReturnType = "boolean",
+        userReturnType = "void")
 public @interface OnPreDraw {
     int value() default View.NO_ID;
 }

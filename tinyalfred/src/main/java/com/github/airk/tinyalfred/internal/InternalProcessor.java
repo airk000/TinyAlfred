@@ -1,9 +1,9 @@
-package com.airk.tool.tinyalfred.internal;
+package com.github.airk.tinyalfred.internal;
 
-import com.airk.tool.tinyalfred.annotation.FindView;
-import com.airk.tool.tinyalfred.annotation.OnClick;
-import com.airk.tool.tinyalfred.annotation.OnLongClick;
-import com.airk.tool.tinyalfred.annotation.OnPreDraw;
+import com.github.airk.tinyalfred.annotation.FindView;
+import com.github.airk.tinyalfred.annotation.OnClick;
+import com.github.airk.tinyalfred.annotation.OnLongClick;
+import com.github.airk.tinyalfred.annotation.OnPreDraw;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;

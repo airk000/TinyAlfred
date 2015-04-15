@@ -1,6 +1,6 @@
-package com.airk.tool.tinyalfred.internal;
+package com.github.airk.tinyalfred.internal;
 
-import com.airk.tool.tinyalfred.TinyAlfred;
+import com.github.airk.tinyalfred.TinyAlfred;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -22,7 +22,7 @@ final class Processor {
     private final Map<Class<? extends Annotation>, Handler> handlers;
 
     Set<ViewModel> viewSet = new LinkedHashSet<ViewModel>();
-    Set<OnClickModel> clickSet = new LinkedHashSet<OnClickModel>();
+    Set<ListenerModel> listenerSet = new LinkedHashSet<ListenerModel>();
 
     static Processor getProcessor(Element e, Elements util, Map<Class<? extends Annotation>, Handler> handlers) {
         TypeElement enclosingElement = (TypeElement) e.getEnclosingElement();
@@ -42,15 +42,15 @@ final class Processor {
         this.handlers = handlers;
     }
 
-    void addFindView(ViewModel bean) {
-        if (!viewSet.contains(bean)) {
-            viewSet.add(bean);
+    void addFindView(ViewModel v) {
+        if (!viewSet.contains(v)) {
+            viewSet.add(v);
         }
     }
 
-    void addOnClick(OnClickModel m) {
-        if (!clickSet.contains(m)) {
-            clickSet.add(m);
+    void addListener(ListenerModel l) {
+        if (!listenerSet.contains(l)) {
+            listenerSet.add(l);
         }
     }
 
