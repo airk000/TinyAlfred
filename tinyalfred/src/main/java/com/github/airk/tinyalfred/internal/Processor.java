@@ -59,8 +59,8 @@ final class Processor {
         builder.append("\npackage ").append(packageName).append(";\n\n");
         builder.append("import android.view.View;\n");
         builder.append("import android.app.Activity;\n");
-        builder.append("import com.airk.tool.tinyalfred.TinyAlfred;\n");
-        builder.append("import com.airk.tool.tinyalfred.Alfred;\n\n");
+        builder.append("import com.github.airk.tinyalfred.TinyAlfred;\n");
+        builder.append("import com.github.airk.tinyalfred.Alfred;\n\n");
 
         builder.append("public class ").append(className)
                 .append(" implements Alfred<").append(fullName).append(">").append(" {\n");

@@ -11,7 +11,7 @@
 
   <groupId>com.github.airk000</groupId>
   <artifactId>tinyalfred-parent</artifactId>
-  <version>0.1.7-SNAPSHOT</version>
+  <version>0.1.8-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Tiny Alfred (Parent)</name>
@@ -20,6 +20,7 @@
 
   <modules>
     <module>tinyalfred</module>
+    <module>sample</module>
   </modules>
 
   <properties>

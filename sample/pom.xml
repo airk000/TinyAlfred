@@ -9,10 +9,16 @@
     <version>0.1.8-SNAPSHOT</version>
   </parent>
 
-  <artifactId>tinyalfred</artifactId>
-  <name>Tiny Alfred</name>
+  <artifactId>sample</artifactId>
+  <name>TinyAlfred Sample</name>
+  <packaging>apk</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>com.github.airk000</groupId>
+      <artifactId>tinyalfred</artifactId>
+      <version>0.1.8-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>com.google.android</groupId>
       <artifactId>android</artifactId>
@@ -23,11 +29,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <compilerArgument>-proc:none</compilerArgument>
-        </configuration>
+        <groupId>com.simpligility.maven.plugins</groupId>
+        <artifactId>android-maven-plugin</artifactId>
+        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>
