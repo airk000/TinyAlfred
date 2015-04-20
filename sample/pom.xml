@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.github.airk000</groupId>
     <artifactId>tinyalfred-parent</artifactId>
-    <version>0.1.8-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>sample</artifactId>
